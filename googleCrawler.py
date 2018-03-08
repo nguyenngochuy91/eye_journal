@@ -2,10 +2,8 @@
 ''' Author  : Huy Nguyen
     Program : Provide a parser and crawler of google scholar 
     Start   : 03/08/2018
-    End     : 05/08/2018
+    End     : 08/08/2018
 '''
-
-import smtplib
 from selenium import webdriver
 import time
 try:
@@ -18,17 +16,23 @@ except ImportError:
 
 class Article(object):
     def __init__self(html):
-        self.html = soup(html).text
-        self.title = None
-        self.author = None
-        self.booktitle = None
-        self.volume = None
-        self.year = None
-        self.title = None
-        self.is_journal = False
-        self.journal = None
-        self.pages   = None
-        
+        self.html = soup(html).text.encode()
+        self.info = {"title":None,
+                     "author":None,
+                     "booktitle":None,
+                     "volume":None,
+                     "year":None,
+                     "journal":None,
+                     "pages":None}
+    def parse():
+        items = self.html.split("\n")
+        for item in items:
+            item = item.split("=")
+            tag  = item[0].replace(" ","")
+            info = item[1].split("{")[1].split("}")[0]
+            
+            
+                
 class Parser(object):
     def __init__(self,url):
         self.url      = url+'&scisbd=1'
@@ -38,7 +42,7 @@ class Parser(object):
         self.soup     =  bs(self.driver.page_source)
         self.urls     = []
         self.articles = [] # list of articles appear on the url, we will retrieve the bibtext file 
-        self.ages     = []        
+        self.times    = []        
     def retrieve_articles(self):
         elements = self.driver.find_elements_by_class_name('gs_or_cit')
         size     = len(elements)
@@ -57,8 +61,14 @@ class Parser(object):
         for t in tags:
             href = t.find("a",href= True)
             self.urls.append(href.attrs['href'])
+    def retrieve_times(self):
+        myspans = self.soup.find_all("span",{"class":"gs_age"})
+        for span in myspans:
+            self.times.append(span.contents[0].split("-")[0].encode())
     def get_articles(self):
         return self.articles
     def get_urls(self):
         return self.urls
+    def get_times(self):
+        return self.times
             
