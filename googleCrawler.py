@@ -15,22 +15,29 @@ except ImportError:
         print ("You need beautifulSoup package buddy")
 
 class Article(object):
-    def __init__self(html):
-        self.html = soup(html).text.encode()
+    def __init__(self,html):
+        self.html = bs(html).text
         self.info = {"title":None,
                      "author":None,
                      "booktitle":None,
                      "volume":None,
                      "year":None,
                      "journal":None,
-                     "pages":None}
-    def parse():
+                     "pages":None,
+                     "organization":None}
+    def parse(self):
         items = self.html.split("\n")
         for item in items:
-            item = item.split("=")
-            tag  = item[0].replace(" ","")
-            info = item[1].split("{")[1].split("}")[0]
-            
+            try:
+                item = item.split("=")
+                tag  = item[0].replace(" ","")
+                info = item[1].split("{")[1].split("}")[0]
+                try:
+                    self.info[tag]= info
+                except:
+                    print ("{} was not found!!!".format(tag))
+            except:
+                continue
             
                 
 class Parser(object):
@@ -54,7 +61,10 @@ class Parser(object):
             element = self.driver.find_element_by_class_name('gs_citi')
             element.click()
             time.sleep(2)
-            self.articles.append(self.driver.page_source)
+            html = self.driver.page_source
+            art  = Article(html)
+            art.parse()
+            self.articles.append(art.info)
             self.driver.get(self.url)
     def retrieve_urls(self):
         tags = self.soup.find_all("h3")
@@ -71,4 +81,14 @@ class Parser(object):
         return self.urls
     def get_times(self):
         return self.times
+    def combine_info(self):
+        self.retrieve_articles()
+        self.retrieve_times()
+        self.retrieve_urls()
+        size = len(self.urls)
+        for i in range(size):
+            url  = self.urls[i]
+            time = self.times[i]
+            self.articles[i]["url"]  = url
+            self.articles[i]["time"] = time
             
