@@ -45,9 +45,9 @@ class Article(object):
                      "year":None,
                      "journal":None}
     def parse(self):
-        info1               = self.contents[0].split(".")
+        info1               = self.contents[0].split('"')
         self.info["author"] = info1[0]
-        self.info["title"]  = info1[1].replace('"',"")
+        self.info["title"]  = info1[1]
         if len(self.contents)>=2:
             journal = self.contents[1].text
             if "preprint" not in journal:
