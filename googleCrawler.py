@@ -42,7 +42,6 @@ class Article(object):
         self.contents = html.contents
         self.info = {"title":None,
                      "author":None,
-                     "year":None,
                      "journal":None}
     def parse(self):
         info1               = self.contents[0].split('"')
