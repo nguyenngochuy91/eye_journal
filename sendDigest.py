@@ -17,9 +17,11 @@ def get_arguments():
     parser.add_argument("-ylo", "--year_low", 
                 help="Lowest bound of the year that the articles were published")   
     parser.add_argument("-yhi", "--year_high", 
-                help="Highest bound of the year that the articles were published")  
-    parser.add_argument("-c", "--count", 
-                help="How many articles for each journal to be in the digest? (max 10)")                                    
+                help="Highest bound of the year that the articles were published") 
+    parser.add_argument("-cJ", "--count_journal", 
+                help="How many journal you want to subscribe? (max 4)")  
+    parser.add_argument("-cA", "--count_article", 
+                help="How many articles for each journal to be in the digest? (max 3)")                                    
     return parser.parse_args()
 
 
@@ -44,13 +46,12 @@ def txt(querier, with_globals,fromaddr,username,password,toAddr,journal):
    @input   : research_topic(string),ylo(string),yhi(string)
    @output  : journals(set)
 '''    
-def get_journals(research_topic,ylo,yhi):
+def get_journals(research_topic,ylo,yhi,count):
     research_query = Query(research_topic=research_topic,ylo=ylo,yhi=yhi)
     url            = research_query.generate_query()
-    parser         = Parser(url,10)
-    parser.retrieve_articles() # retrieve all the articles
-    articles       = parser.get_articles()
-    journals       = set([art["journal"] if art["journal"] else art["booktitle"] for art in articles ])
+    parser         = Parser(url,count)
+    parser.retrieve_journals() # retrieve all the articles
+    journals       = parser.get_journals()
     return journals
 
 '''@function: given the journal name, return a dictionary that store information of all recent articles
@@ -62,7 +63,7 @@ def get_articles(journal,ylo,yhi,count):
     journal_query  = Query(research_topic= journal,ylo=ylo,yhi=yhi)
     url            = journal_query.generate_query()
     parser         = Parser(url,count)
-    parser.retrieve_articles() # retrieve all the articles
+    parser.generate_articles() # retrieve all the articles
     articles       = parser.get_articles()
     return articles
 
@@ -72,13 +73,15 @@ if __name__ == '__main__':
     research_topic  = args.research_topic
     ylo             = args.year_low
     yhi             = args.year_high
-    count           = int(args.count)
+    count_journal   = int(args.count_journal)
+    count_article   = int(args.count_article)
+    
     print ("Getting all journals for topic {}".format(research_topic))
-    journals        = get_journals(research_topic,ylo,yhi)
+    journals        = get_journals(research_topic,ylo,yhi,count_journal)
     print ("Done with getting all journals")
     print (separation)
     journal_article = {}
     for journal in journals:
         print ("Getting articles for journal {}".format(journal))
-        journal_article[journal] = get_articles(journal,ylo,yhi,count)
+        journal_article[journal] = get_articles(journal,ylo,yhi,count_article)
     print (journal_article)
