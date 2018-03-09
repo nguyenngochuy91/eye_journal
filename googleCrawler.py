@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ''' Author  : Huy Nguyen
-    Program : Provide a parser and crawler of google scholar 
+    Program : Provide a parser and crawler of google scholar, and a query 
     Start   : 03/08/2018
     End     : 08/08/2018
 '''
@@ -13,10 +13,33 @@ except ImportError:
         from BeautifulSoup import BeautifulSoup as bs
     except ImportError:
         print ("You need beautifulSoup package buddy")
-
+class Query(object):
+    google_query = 'https://scholar.google.com/scholar?scisbd=1&hl=en&as_sdt=0,16'\
+        + '&q=%(query)s' \
+        + '&as_ylo=%(ylo)s' \
+        + '&as_yhi=%(yhi)s' \
+        + '&btnG=&hl=en' \
+        + 'as_sdt=0,16' \
+        + '&scisbd=1'
+    
+    def __init__(self,research_topic= "",journals= "",ylo = "",yhi= ""):
+        self.research_topic = research_topic
+        self.journals       = journals
+        self.ylo            = ylo
+        self.yhi            = yhi
+        self.query          = ""
+    def generate_query(self):
+        if self.research_topic:
+            self.query+=self.research_topic.replace(" ","+")
+        elif self.journals:
+            self.query+=self.journals.replace(" ","+")
+        args = {'query': self.query,
+               'ylo': self.ylo,
+               'yhi': self.yhi}
+        return self.google_query % args
 class Article(object):
     def __init__(self,html):
-        self.html = bs(html).text
+        self.html = bs(html,"lxml").text
         self.info = {"title":None,
                      "author":None,
                      "booktitle":None,
@@ -33,31 +56,31 @@ class Article(object):
                 tag  = item[0].replace(" ","")
                 info = item[1].split("{")[1].split("}")[0]
                 try:
-                    self.info[tag]= info
+                    self.info[tag]= info.encode()
                 except:
-                    print ("{} was not found!!!".format(tag))
+                    print ("tag {} was not found!!!".format(tag))
             except:
                 continue
             
                 
 class Parser(object):
-    def __init__(self,url):
-        self.url      = url+'&scisbd=1'
+    def __init__(self,url,size):
+        self.size     = min(size,10)
+        self.url      = url
         self.driver   = webdriver.PhantomJS(service_args=['--ignore-ssl-errors=true', '--ssl-protocol=any'])
         self.driver.set_window_size(1124, 850)
         self.driver.get(self.url)
-        self.soup     =  bs(self.driver.page_source)
+        self.soup     =  bs(self.driver.page_source,"lxml") # this is the parrent page to query the date and urls
         self.urls     = []
         self.articles = [] # list of articles appear on the url, we will retrieve the bibtext file 
         self.times    = []        
     def retrieve_articles(self):
-        elements = self.driver.find_elements_by_class_name('gs_or_cit')
-        size     = len(elements)
-        for i in range(size):
+        # using selenium to crawl to bibtex info
+        for i in range(self.size):
             elements = self.driver.find_elements_by_class_name('gs_or_cit')
             element  = elements[i]
             element.click()
-            time.sleep(1)
+            time.sleep(2)
             element = self.driver.find_element_by_class_name('gs_citi')
             element.click()
             time.sleep(2)
@@ -65,6 +88,7 @@ class Parser(object):
             art  = Article(html)
             art.parse()
             self.articles.append(art.info)
+            print ("Done with article {}".format(art.info["title"]))
             self.driver.get(self.url)
     def retrieve_urls(self):
         tags = self.soup.find_all("h3")
@@ -81,7 +105,7 @@ class Parser(object):
         return self.urls
     def get_times(self):
         return self.times
-    def combine_info(self):
+    def generate_articles(self):
         self.retrieve_articles()
         self.retrieve_times()
         self.retrieve_urls()
