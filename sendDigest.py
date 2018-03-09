@@ -29,12 +29,11 @@ def get_arguments():
    @input   : a lot
    @output  : none
 '''    
-def txt(querier, with_globals,fromaddr,username,password,toAddr,journal):
+def generate_digets(journal_article, fromaddr,username,password,toAddr):
     server = smtplib.SMTP(host='smtp.gmail.com', port=587)
     server.ehlo()
     server.starttls()
     server.login(username,password)
-    articles = querier.articles
     header = 'To:' + toAddr + '\n' + 'From: ' + fromaddr + '\n' + 'Subject:New digest \n'
     string   = "\n {}".format(journal)
     for art in articles:

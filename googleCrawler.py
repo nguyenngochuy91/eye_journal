@@ -39,28 +39,20 @@ class Query(object):
         return self.google_query % args
 class Article(object):
     def __init__(self,html):
-        self.html = bs(html,"lxml").text
+        self.contents = html.contents
         self.info = {"title":None,
                      "author":None,
-                     "booktitle":None,
-                     "volume":None,
                      "year":None,
-                     "journal":None,
-                     "pages":None,
-                     "organization":None}
+                     "journal":None}
     def parse(self):
-        items = self.html.split("\n")
-        for item in items:
-            try:
-                item = item.split("=")
-                tag  = item[0].replace(" ","")
-                info = item[1].split("{")[1].split("}")[0]
-                try:
-                    self.info[tag]= info
-                except:
-                    print ("tag {} was not found!!!".format(tag))
-            except:
-                continue
+        info1               = self.contents[0].split(".")
+        self.info["author"] = info1[0]
+        self.info["title"]  = info1[1].replace('"',"")
+        if len(self.contents)>=2:
+            journal = self.contents[1].text
+            if "preprint" not in journal:
+                self.info["journal"] = self.contents[1].text
+        
             
                 
 class Parser(object):
@@ -81,15 +73,14 @@ class Parser(object):
             elements = self.driver.find_elements_by_class_name('gs_or_cit')
             element  = elements[i]
             element.click()
-            time.sleep(2)
-            element = self.driver.find_element_by_class_name('gs_citi')
-            element.click()
-            time.sleep(2)
-            html = self.driver.page_source
+            time.sleep(1)
+            soup = bs(self.driver.page_source,"lxml")
+            soup = soup.find("div",{"id":"gs_citt"})
+            html  = soup.find("div",{"class":"gs_citr"})                        
             art  = Article(html)
             art.parse()
             self.articles.append(art.info)
-            print ("Done with article {}".format(art.info["title"]))
+#            print ("Done with article {}".format(art.info["title"]))
             self.driver.get(self.url)
     def retrieve_journals(self):
         # using selenium to crawl to bibtex info
@@ -97,15 +88,15 @@ class Parser(object):
             elements = self.driver.find_elements_by_class_name('gs_or_cit')
             element  = elements[i]
             element.click()
-            time.sleep(2)
-            element = self.driver.find_element_by_class_name('gs_citi')
-            element.click()
-            time.sleep(2)
-            html = self.driver.page_source
+            time.sleep(1)
+            soup = bs(self.driver.page_source,"lxml")
+            soup = soup.find("div",{"id":"gs_citt"})
+            html  = soup.find("div",{"class":"gs_citr"})                        
             art  = Article(html)
             art.parse()
-            self.journals.add(art.info["journal"])
-            print ("Done with article {}".format(art.info["title"]))
+            if art.info["journal"]:
+                self.journals.add(art.info["journal"])
+#            print ("Done with article {}".format(art.info["title"]))
             self.driver.get(self.url)
             if len(self.journals)== self.size:
                 break
