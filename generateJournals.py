@@ -9,7 +9,7 @@ from googleCrawler import Parser
    @input   : research_topic(string),ylo(string),yhi(string)
    @output  : journals(set)
 '''    
-def get_journals_from_url(url,ylo,yhi,count):
+def get_journals_from_url(url,count):
     parser         = Parser(url,count)
     parser.retrieve_journals() # retrieve all the articles
     journals       = parser.get_journals()

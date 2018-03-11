@@ -55,7 +55,7 @@ class Article(object):
             
                 
 class Parser(object):
-    def __init__(self,url,size):
+    def __init__(self,url,size=10):
         self.size     = min(size,10)
         self.url      = url
         self.driver   = webdriver.PhantomJS(service_args=['--ignore-ssl-errors=true', '--ssl-protocol=any'])
