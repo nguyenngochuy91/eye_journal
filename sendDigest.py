@@ -6,7 +6,10 @@
 '''
 import smtplib
 import argparse
-from email.MIMEText import MIMEText
+try:
+    from email.MIMEText import MIMEText
+except: 
+    from email.mime.text import MIMEText
 import codecs
 # argument parsing
 def get_arguments():
@@ -36,7 +39,7 @@ def send_digets(json_file, from_addr,username,password,to_addr):
 #        journal_article = json.load(data_file)
 #    print (json.dumps(journal_article))
     f = codecs.open(json_file, "r", "utf-8")
-    msg = MIMEText(f.read().rstrip("\n"), 'plain', 'utf-8')
+    msg = MIMEText(f.read().rstrip("\n"), 'html', 'utf-8')
     msg['From'] = from_addr
     msg['To'] = to_addr
     msg['Subject'] = "New digest"

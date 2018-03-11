@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ''' Author  : Huy Nguyen
-    Program : Generate a json file that store digest to be send
+    Program : Generate a json file given journals name that store digest to be send
     Start   : 03/08/2018
     End     : 08/08/2018
 '''
@@ -11,15 +11,14 @@ import argparse
 # argument parsing
 def get_arguments():
     parser = argparse.ArgumentParser(description='The purpose of this program is to generate digest of the most recent articles from subscribed article given user research topic')
-    
-    parser.add_argument("-r", "--research_topic", 
-                help="Research topic user want to find, have to be in quotation ('Dynamic Programming')") 
+    parser.add_argument("-db", "--database", 
+                help="SQL database to query for the list of subscribed journals")     
+    parser.add_argument("-id", "--user_id", 
+                help="user id for the key search") 
     parser.add_argument("-ylo", "--year_low", 
                 help="Lowest bound of the year that the articles were published")   
     parser.add_argument("-yhi", "--year_high", 
                 help="Highest bound of the year that the articles were published") 
-    parser.add_argument("-cJ", "--count_journal", 
-                help="How many journal you want to subscribe? (max 4)")  
     parser.add_argument("-cA", "--count_article", 
                 help="How many articles for each journal to be in the digest? (max 3)")     
     parser.add_argument("-o", "--output", 
@@ -27,16 +26,23 @@ def get_arguments():
     return parser.parse_args()
 
     
-'''@function: given the research topic, return the set of journals of interest
+'''@function: given the url, return the set of journals of interest
    @input   : research_topic(string),ylo(string),yhi(string)
    @output  : journals(set)
 '''    
-def get_journals(research_topic,ylo,yhi,count):
-    research_query = Query(research_topic=research_topic,ylo=ylo,yhi=yhi)
-    url            = research_query.generate_query()
+def get_journals_from_url(url,ylo,yhi,count):
     parser         = Parser(url,count)
     parser.retrieve_journals() # retrieve all the articles
     journals       = parser.get_journals()
+    return journals
+
+    
+'''@function: given the url, return the set of journals of interest
+   @input   : research_topic(string),ylo(string),yhi(string)
+   @output  : journals(set)
+'''    
+def get_journals_from_db(user_id,db):
+    journals       = []
     return journals
 
 '''@function: given the journal name, return a dictionary that store information of all recent articles
@@ -51,19 +57,23 @@ def get_articles(journal,ylo,yhi,count):
     parser.generate_articles() # retrieve all the articles
     articles       = parser.get_articles()
     return articles
-
+'''@function: given the dictionary of articles, we pretify this using json with html thingy
+   @input   : articles(dic)
+   @output  : articles(dic) 
+'''  
+def add_html(journal_article):
+    
+    return journal_article
 if __name__ == '__main__':
     separation      = "*"*100
     args            = get_arguments()
-    research_topic  = args.research_topic
     ylo             = args.year_low
     yhi             = args.year_high
-    count_journal   = int(args.count_journal)
+    db              = args.database
+    user_id         = args.user_id
     count_article   = int(args.count_article)
     outfile         = "request_json/"+args.output+".json"
-    print ("Getting all journals for topic {}".format(research_topic))
-    journals        = get_journals(research_topic,ylo,yhi,count_journal)
-    print ("Done with getting all journals")
+    journals        = get_journals_from_db(user_id,db)
     print (separation)
     journal_article = {}
     for journal in journals:
