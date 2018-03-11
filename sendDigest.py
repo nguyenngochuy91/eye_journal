@@ -47,7 +47,12 @@ def send_digets(json_file, from_addr,username,password,to_addr):
     server.sendmail(from_addr, to_addr,msg.as_string())
     server.quit()  
     
-
+'''@function: given the dictionary of articles, we pretify this using json with html thingy
+   @input   : articles(dic)
+   @output  : articles(dic) 
+'''  
+def add_html(json_file):
+    return json_file
 
 if __name__ == '__main__':
     args      = get_arguments()

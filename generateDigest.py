@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ''' Author  : Huy Nguyen
-    Program : Generate a json file given journals name that store digest to be send
+    Program : Generate a json (digest) file given journals name from database
     Start   : 03/08/2018
     End     : 08/08/2018
 '''
@@ -26,15 +26,6 @@ def get_arguments():
     return parser.parse_args()
 
     
-'''@function: given the url, return the set of journals of interest
-   @input   : research_topic(string),ylo(string),yhi(string)
-   @output  : journals(set)
-'''    
-def get_journals_from_url(url,ylo,yhi,count):
-    parser         = Parser(url,count)
-    parser.retrieve_journals() # retrieve all the articles
-    journals       = parser.get_journals()
-    return journals
 
     
 '''@function: given the url, return the set of journals of interest
@@ -57,13 +48,8 @@ def get_articles(journal,ylo,yhi,count):
     parser.generate_articles() # retrieve all the articles
     articles       = parser.get_articles()
     return articles
-'''@function: given the dictionary of articles, we pretify this using json with html thingy
-   @input   : articles(dic)
-   @output  : articles(dic) 
-'''  
-def add_html(journal_article):
-    
-    return journal_article
+
+
 if __name__ == '__main__':
     separation      = "*"*100
     args            = get_arguments()
