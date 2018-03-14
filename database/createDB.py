@@ -7,7 +7,9 @@
 import sqlite3 as lite
 import argparse
 from db import Journal
-
+import zipfile
+from openpyxl import load_workbook
+# get the argument
 def get_arguments():
     parser = argparse.ArgumentParser(description='The purpose of this program is  \
                                      to create a database mysql')
@@ -18,17 +20,28 @@ def get_arguments():
     parser.add_argument("-db_password", "--DB_PASSWORD",
                 help="password for the db") 
     parser.add_argument("-db_host", "--DB_HOST", default = "127.0.0.1",
-                help="Host for the db server")                                     
+                help="Host for the db server")       
+    parser.add_argument("-s", "--scopus", default = "scopus_2017.xlsx",
+                help="Scopus that store all the name of peerer review journals (https://www.scopus.com/sources.uri?DGCID=Scopus_blog_post_check2015) ")                                  
     return parser.parse_args()
 
-
+# program that parse all article name into a dictionary
+def read_xlsx(infile):
+    load         = load_workbook(infile)
+    worksheet    = load.active
+    interest_col = worksheet['B']        
+    return [item.value.encode('utf-8').replace("'"," ") for item in interest_col]
+    
 if __name__ == '__main__':
-    separation      = "*"*100
-    args            = get_arguments()
-    DB_NAME         = args.DB_NAME
-    DB_USER         = args.DB_USER
-    DB_PASSWORD     = args.DB_PASSWORD
-    DB_HOST         = args.DB_HOST
+    separation   = "*"*100
+    args         = get_arguments()
+    DB_NAME      = args.DB_NAME
+    DB_USER      = args.DB_USER
+    DB_PASSWORD  = args.DB_PASSWORD
+    DB_HOST      = args.DB_HOST
+    scopus       = args.scopus
+    # store all of scopus of journal into a dic:
+    journal_name = read_xlsx(scopus)[1:]
     # open database connection
     db = lite.connect(DB_NAME,detect_types=lite.PARSE_DECLTYPES)
     # prepare a cursor object using cursor() method
@@ -64,6 +77,12 @@ if __name__ == '__main__':
     cursor.execute(user) # add user table
     cursor.execute(journal) # add journal table
     cursor.execute(subscription)
+    
+    # insert our journal_name into the journals database
+    for i in range(len(journal_name)):
+        j = Journal((i+1,journal_name[i]))
+        command = j.insert_command()
+        cursor.execute(command)
     # disconnect from server
     db.commit()
     cursor.close()
