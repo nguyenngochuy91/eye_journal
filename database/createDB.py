@@ -58,7 +58,7 @@ if __name__ == '__main__':
     UPDATE_PERIOD INT,  
     [CREATE_DATE] TIMESTAMP ,
     [LAST_UPDATED] TIMESTAMP ,
-    PRIMARY KEY (EMAIL))"""
+    PRIMARY KEY (ID))"""
     
     journal = """CREATE TABLE JOURNAL (
     ID  INT NOT NULL,
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     # insert our journal_name into the journals database
     for i in range(len(journal_name)):
         j = Journal((i+1,journal_name[i]))
-        command = j.insert_command()
+        command = j.to_sql_command()
         cursor.execute(command)
     # disconnect from server
     db.commit()
