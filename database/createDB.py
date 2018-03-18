@@ -58,7 +58,7 @@ if __name__ == '__main__':
     UPDATE_PERIOD INT,  
     [CREATE_DATE] TIMESTAMP ,
     [LAST_UPDATED] TIMESTAMP ,
-    PRIMARY KEY (ID))"""
+    PRIMARY KEY (EMAIL))"""
     
     journal = """CREATE TABLE JOURNAL (
     ID  INT NOT NULL,

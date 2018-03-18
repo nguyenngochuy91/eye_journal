@@ -4,10 +4,12 @@
     Start   : 03/08/2018
     End     : 08/08/2018
 '''
-
+import sys
+sys.path.append('../database/')
 from googleCrawler import Query,Parser
 import json
 import argparse
+import db
 # argument parsing
 def get_arguments():
     parser = argparse.ArgumentParser(description='The purpose of this program is to generate digest of the most recent articles from subscribed article given user research topic')
@@ -40,7 +42,7 @@ def get_journals_from_url(url,count):
    @input   : research_topic(string),ylo(string),yhi(string)
    @output  : journals(set)
 '''    
-def get_journals_from_db(user_id,db):
+def get_journals_from_db(user_id,mydb):
     journals       = []
     return journals
 
@@ -63,11 +65,11 @@ if __name__ == '__main__':
     args            = get_arguments()
     ylo             = args.year_low
     yhi             = args.year_high
-    db              = args.database
+    mydb            = args.database
     user_id         = args.user_id
     count_article   = int(args.count_article)
     outfile         = "request_json/"+args.output+".json"
-    journals        = get_journals_from_db(user_id,db)
+    journals        = get_journals_from_db(user_id,mydb)
     print (separation)
     journal_article = {}
     for journal in journals:

@@ -13,8 +13,8 @@ class User(object):
         self.id            = myTuple[0]
         self.email         = myTuple[1]
         self.update_period = myTuple[2]
-        self.create_day    = myTuple[3]
-        self.last_updated  = myTuple[4]
+        self.create_day    = "'"+myTuple[3]+"'"
+        self.last_updated  = "'"+myTuple[4]+"'"
     def insert_command(self):
         return """INSERT INTO USER VALUES ({},{},{},{},{})""".format(self.id,self.email,
                                          self.update_period,self.create_day,self.last_updated)
@@ -31,7 +31,7 @@ class Subscription(object):
         self.id            = myTuple[0]
         self.user_id       = myTuple[1]
         self.journal_id    = myTuple[2]
-        self.create_day    = myTuple[3]
+        self.create_day    = "'"+myTuple[3]+"'"
     def insert_command(self):
         return """INSERT INTO SUBSCRIPTION VALUES ({},{},{},{},{})""".format(self.id,self.user_id,
                                          self.journal_id,self.create_day)
