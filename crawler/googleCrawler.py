@@ -2,7 +2,7 @@
 ''' Author  : Huy Nguyen
     Program : Provide a parser and crawler of google scholar, and a query 
     Start   : 03/08/2018
-    End     : 08/08/2018
+    End     : 03/15/2018
 '''
 from selenium import webdriver
 import time

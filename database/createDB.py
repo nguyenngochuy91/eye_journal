@@ -2,12 +2,11 @@
 ''' Author  : Huy Nguyen
     Program : Create a database for user, journal, and subsription
     Start   : 03/08/2018
-    End     : 08/08/2018
+    End     : 03/08/2018
 '''
 import sqlite3 as lite
 import argparse
 from db import Journal
-import zipfile
 from openpyxl import load_workbook
 # get the argument
 def get_arguments():
@@ -33,7 +32,6 @@ def read_xlsx(infile):
     return [item.value.encode('utf-8').replace("'"," ") for item in interest_col]
     
 if __name__ == '__main__':
-    separation   = "*"*100
     args         = get_arguments()
     DB_NAME      = args.DB_NAME
     DB_USER      = args.DB_USER
