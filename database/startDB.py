@@ -58,14 +58,14 @@ def get_journals_from_user(database,user_id):
 def get_journals_for_users(database,users):
     all_journals =[]
     for user in users:
-        all_journals.apped(get_journals_from_user(database,user))
+        all_journals.append(get_journals_from_user(database,user))
     return all_journals
 # create some basic fake data for testing purpose
 def testing(database,emails,num_user,num_subscription):
     cursor = database.cursor()
     # adding several users
     for i in range(1,num_user+1):
-        command = db.User((i,emails[i-1],random.randint(120,150),datetime.datetime.now(),datetime.datetime.now()))
+        command = db.User((i,emails[i-1],random.randint(20,40),datetime.datetime.now(),datetime.datetime.now()))
         cursor.execute(command.to_sql_command())
         
     # adding several subscriptions
@@ -119,11 +119,12 @@ if __name__ == '__main__':
     database  = lite.connect("pb",detect_types=lite.PARSE_DECLTYPES)
     # testing, add some random thingy
     emails = ["huyn@iastate.edu","alex_koshmarkin@mail.ru","amarkin@iastate.edu","kmousavi@iastate.edu"]
-    testing(database,4,5)
+    testing(database,emails,4,5)
     c=1
     while True:
         current_time = datetime.datetime.now()
         users = need_update_user(database,current_time)
+        print ("Cycle:{}".format(c))
         print (users)
         # for each of these users
         # update the time in the user table of the last_updated
@@ -133,7 +134,7 @@ if __name__ == '__main__':
         all_journals = get_journals_for_users(database,users)
         for item in all_journals:
             to_addr          = item["email"]
-            json_file        = log_dir+to_addr+"_"+str(c)
+            json_file        = log_dir+to_addr+"_"+str(c)+".json"
             list_of_journals = item["journal"]
             all_articles = {}
             for journal in list_of_journals:
@@ -141,5 +142,5 @@ if __name__ == '__main__':
             with open(json_file,"w") as data_file:
                 json.dump(all_articles,data_file)
             send_digest(json_file, username,username,password,to_addr)
-        time.sleep(60)
+        time.sleep(10)
         c+=1

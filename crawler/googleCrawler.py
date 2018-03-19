@@ -60,15 +60,18 @@ class Parser(object):
         self.url      = url
         self.driver   = webdriver.PhantomJS(service_args=['--ignore-ssl-errors=true', '--ssl-protocol=any'])
         self.driver.set_window_size(1124, 850)
+        print ("url of journal",self.url)
         self.driver.get(self.url)
         self.soup     =  bs(self.driver.page_source,"lxml") # this is the parrent page to query the date and urls
         self.urls     = []
         self.articles = [] # list of articles appear on the url, we will retrieve the bibtext file 
         self.times    = []   
         self.journals = set()
+        elements = self.driver.find_elements_by_class_name('gs_or_cit')
+        self.articles_num = len(elements)
     def retrieve_articles(self):
         # using selenium to crawl to bibtex info
-        for i in range(self.size):
+        for i in range(min(self.articles_num,self.size)):
             elements = self.driver.find_elements_by_class_name('gs_or_cit')
             element  = elements[i]
             element.click()
@@ -120,7 +123,7 @@ class Parser(object):
         self.retrieve_articles()
         self.retrieve_times()
         self.retrieve_urls()
-        for i in range(self.size):
+        for i in range(min(self.articles_num,self.size)):
             url  = self.urls[i]
             time = self.times[i]
             self.articles[i]["url"]  = url
